@@ -5,11 +5,13 @@ public class BrandPageResDto {
 
     private int page;
     private int totalPages;
+    private int pageSize;
     private List<BrandResDto> brands;
 
-    public BrandPageResDto(int page, int totalPages, List<BrandResDto> brands) {
+    public BrandPageResDto(int page, int totalPages, int pageSize, List<BrandResDto> brands) {
         this.page = page;
         this.totalPages = totalPages;
+        this.pageSize = pageSize;
         this.brands = brands;
     }
 
@@ -27,6 +29,14 @@ public class BrandPageResDto {
 
     public void setTotalPages(int totalPages) {
         this.totalPages = totalPages;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
 
     public List<BrandResDto> getBrands() {

@@ -25,8 +25,10 @@
                         <strong class="text" th:text="${userPage.totalPages}"></strong>
                     </h5>
                     <div class="btn-group" role="group" aria-label="Pagination">
-                        <a th:if="${userPage.page > 1}" class="btn btn-secondary" th:href="@{/user(page=${userPage.page - 1})}">&lt; Previous</a>
-                        <a th:if="${userPage.page < userPage.totalPages}" class="btn btn-secondary" th:href="@{/user(page=${userPage.page + 1})}">Next &gt;</a>
+                        <a th:if="${userPage.page > 1}" class="btn btn-secondary"
+                           th:href="@{/user(page=${userPage.page - 1}, pageSize=${userPage.pageSize})}">&lt; Previous</a>
+                        <a th:if="${userPage.page < userPage.totalPages}" class="btn btn-secondary"
+                           th:href="@{/user(page=${userPage.page + 1}, pageSize=${userPage.pageSize})}">Next &gt;</a>
                     </div>
                 </div>
             </div>

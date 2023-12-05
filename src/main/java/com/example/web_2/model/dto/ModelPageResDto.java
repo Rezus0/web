@@ -5,11 +5,13 @@ import java.util.List;
 public class ModelPageResDto {
     private int page;
     private int totalPages;
+    private int pageSize;
     private List<ModelResDto> models;
 
-    public ModelPageResDto(int page, int totalPages, List<ModelResDto> models) {
+    public ModelPageResDto(int page, int totalPages, int pageSize, List<ModelResDto> models) {
         this.page = page;
         this.totalPages = totalPages;
+        this.pageSize = pageSize;
         this.models = models;
     }
 
@@ -27,6 +29,14 @@ public class ModelPageResDto {
 
     public void setTotalPages(int totalPages) {
         this.totalPages = totalPages;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
 
     public List<ModelResDto> getModels() {

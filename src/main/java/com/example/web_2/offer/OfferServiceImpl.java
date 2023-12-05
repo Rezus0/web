@@ -28,7 +28,7 @@ public class OfferServiceImpl implements OfferService {
 
     private OfferRepository offerRepository;
     private UserRepository userRepository;
-    private ModelRepository modelRepository;;
+    private ModelRepository modelRepository;
     private final ModelMapper mapper;
 
     public OfferServiceImpl(ModelMapper mapper) {
@@ -54,7 +54,7 @@ public class OfferServiceImpl implements OfferService {
                 .stream()
                 .map(offer -> mapper.map(offer, OfferResDto.class))
                 .toList();
-        return new OfferPageResDto(pageNumber, totalPages, list);
+        return new OfferPageResDto(pageNumber, totalPages, pageSize, list);
     }
 
     @Override

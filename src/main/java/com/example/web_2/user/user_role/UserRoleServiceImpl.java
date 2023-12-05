@@ -43,7 +43,7 @@ public class UserRoleServiceImpl implements UserRoleService {
                 .stream()
                 .map(userRole -> mapper.map(userRole, UserRoleResDto.class))
                 .toList();
-        return new UserRolePageResDto(pageNumber, totalPages, list);
+        return new UserRolePageResDto(pageNumber, totalPages, pageSize, list);
     }
 
     @Override

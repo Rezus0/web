@@ -5,11 +5,13 @@ import java.util.List;
 public class OfferPageResDto {
     private int page;
     private int totalPages;
+    private int pageSize;
     private List<OfferResDto> offers;
 
-    public OfferPageResDto(int page, int totalPages, List<OfferResDto> offers) {
+    public OfferPageResDto(int page, int totalPages, int pageSize, List<OfferResDto> offers) {
         this.page = page;
         this.totalPages = totalPages;
+        this.pageSize = pageSize;
         this.offers = offers;
     }
 
@@ -27,6 +29,14 @@ public class OfferPageResDto {
 
     public void setTotalPages(int totalPages) {
         this.totalPages = totalPages;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
 
     public List<OfferResDto> getOffers() {

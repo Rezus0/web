@@ -49,7 +49,7 @@ public class ModelServiceImpl implements ModelService {
                 .stream()
                 .map(model -> mapper.map(model, ModelResDto.class))
                 .toList();
-        return new ModelPageResDto(pageNumber, totalPages, list);
+        return new ModelPageResDto(pageNumber, totalPages, pageSize, list);
     }
 
     @Override

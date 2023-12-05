@@ -47,7 +47,7 @@ public class BrandServiceImpl implements BrandService {
                 .stream()
                 .map(brand -> mapper.map(brand, BrandResDto.class))
                 .toList();
-        return new BrandPageResDto(pageNumber, totalPages, list);
+        return new BrandPageResDto(pageNumber, totalPages, pageSize, list);
     }
 
     @Override

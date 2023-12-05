@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(user -> mapper.map(user, UserResDto.class))
                 .toList();
-        return new UserPageResDto(pageNumber, totalPages, list);
+        return new UserPageResDto(pageNumber, totalPages, pageSize, list);
     }
 
     @Override
