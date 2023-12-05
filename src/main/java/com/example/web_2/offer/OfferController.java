@@ -8,6 +8,7 @@ import com.example.web_2.offer.dto.UserOffersView;
 import com.example.web_2.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -85,7 +86,8 @@ public class OfferController {
     }
 
     @PutMapping("/{id}")
-    public ModelAndView updatOffer(@PathVariable String id, @Valid OfferReqDto offerReqDto,
+    @PreAuthorize("hasRole('ADMIN')")
+    public ModelAndView updateOffer(@PathVariable String id, @Valid OfferReqDto offerReqDto,
                                     BindingResult bindingResult, ModelAndView maw) {
         if (bindingResult.hasErrors()) {
             maw.addObject("offerReqDto", offerReqDto);
@@ -103,6 +105,7 @@ public class OfferController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView deleteOffer(@PathVariable String id, ModelAndView maw) {
         offerService.delete(id);
         maw.setViewName("redirect:/offer");

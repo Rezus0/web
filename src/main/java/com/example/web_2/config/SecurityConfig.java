@@ -6,7 +6,7 @@ import com.example.web_2.user.user_role.Role;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,6 +18,7 @@ import org.springframework.security.web.context.RequestAttributeSecurityContextR
 import org.springframework.security.web.context.SecurityContextRepository;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final UserRepository userRepository;
@@ -46,15 +47,11 @@ public class SecurityConfig {
                                         .requestMatchers("/", "/login", "/register",
                                                 "/login-error", "/bootstrap.min.css")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/brand", "/model")
+                                        .requestMatchers("/brand", "/model")
                                         .permitAll()
-                                        .requestMatchers("/offer", "/user   ", "/user-role/**",
-                                                "/offer/add", "/brand/add", "/model/add",
-                                                "/brand/update", "/model/update", "/offer/update")
-                                        .hasRole(Role.ADMIN.name())
-                                        .requestMatchers(HttpMethod.DELETE, "/brand/*")
-                                        .hasRole(Role.ADMIN.name())
-                                        .requestMatchers(HttpMethod.PUT, "/**")
+                                        .requestMatchers("/offer", "/user", "/user-role/**",
+                                                "/offer/add", "/brand/add", "/model/add", "user/add",
+                                                "/brand/update", "/model/update", "/offer/update", "user/update")
                                         .hasRole(Role.ADMIN.name())
                                         .anyRequest().authenticated()
                 )

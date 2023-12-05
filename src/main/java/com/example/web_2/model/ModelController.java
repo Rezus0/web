@@ -6,6 +6,7 @@ import com.example.web_2.model.dto.ModelReqDto;
 import com.example.web_2.model.dto.ModelResDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -71,6 +72,7 @@ public class ModelController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView updateModel(@PathVariable String id, @Valid ModelReqDto modelReqDto,
                                     BindingResult bindingResult, ModelAndView maw) {
         if (bindingResult.hasErrors()) {
@@ -88,6 +90,7 @@ public class ModelController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView deleteModel(@PathVariable String id, ModelAndView maw) {
         modelService.delete(id);
         maw.setViewName("redirect:/model");

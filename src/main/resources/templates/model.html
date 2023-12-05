@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-100" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" class="h-100" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head}"><title>Web App</title></head>
 <body class="d-flex flex-column h-100">
 <div th:replace="~{fragments/navbar}">Navbar</div>
@@ -25,13 +25,14 @@
                         <h4 th:text="'Created: ' + ${model.createdAsString}"></h4>
                         <h4 th:text="'Modified: ' + ${model.modifiedAsString}"></h4>
                         <div class="d-flex justify-content-center align-bottom mb-3">
-                            <form th:action="@{/model/update/{id}(id=${model.id})}" th:method="get">
+                            <form th:action="@{/model/update/{id}(id=${model.id})}" th:method="get"
+                                  sec:authorize="hasRole('ADMIN')">
                                 <button type="submit" class="btn btn-success align-bottom">
                                     Update Model
                                 </button>
                             </form>
-                            <form th:action="@{/model/{id}(id=${model.id})}"
-                                  th:method="post">
+                            <form th:action="@{/model/{id}(id=${model.id})}" th:method="post"
+                                  sec:authorize="hasRole('ADMIN')">
                                 <input type="hidden" name="_method" value="DELETE"/>
                                 <button type="submit" class="btn btn-danger align-bottom">
                                     Delete Model

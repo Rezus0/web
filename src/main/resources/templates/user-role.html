@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-100" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" class="h-100" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head}"><title>Web App</title></head>
 <body class="d-flex flex-column h-100">
 <div th:replace="~{fragments/navbar}">Navbar</div>
@@ -18,13 +18,14 @@
                         <h4 th:text="'Id: ' + ${userRole.id}"></h4>
                         <h4 th:text="'Name: ' + ${userRole.name}"></h4>
                         <div class="align-bottom">
-                            <form th:action="@{/user-role/update/{id}(id=${userRole.id})}" th:method="get">
+                            <form th:action="@{/user-role/update/{id}(id=${userRole.id})}" th:method="get"
+                                  sec:authorize="hasRole('ADMIN')">
                                 <button type="submit" class="btn btn-success align-bottom">
                                     Update User Role
                                 </button>
                             </form>
-                            <form th:action="@{/user-role/{id}(id=${userRole.id})}"
-                                  th:method="post">
+                            <form th:action="@{/user-role/{id}(id=${userRole.id})}" th:method="post"
+                                  sec:authorize="hasRole('ADMIN')">
                                 <input type="hidden" name="_method" value="DELETE"/>
                                 <button type="submit" class="btn btn-danger align-bottom">
                                     Delete User Role

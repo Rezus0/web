@@ -6,6 +6,7 @@ import com.example.web_2.user.dto.UserResDto;
 import com.example.web_2.user.user_role.UserRoleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -80,6 +81,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView updateUser(@PathVariable String id, @Valid UserReqDto userReqDto,
                                     BindingResult bindingResult, ModelAndView maw) {
         if (bindingResult.hasFieldErrors("username")) {
@@ -99,6 +101,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView deleteUser(@PathVariable String id, ModelAndView maw) {
         userService.delete(id);
         maw.setViewName("redirect:/user");

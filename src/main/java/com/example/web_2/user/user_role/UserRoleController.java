@@ -5,6 +5,7 @@ import com.example.web_2.user.user_role.dto.UserRoleReqDto;
 import com.example.web_2.user.user_role.dto.UserRoleResDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +59,7 @@ public class UserRoleController {
     }
 
     @GetMapping("/update/{id}")
-    public ModelAndView updateModel(@PathVariable String id, ModelAndView maw) {
+    public ModelAndView updateUserRole(@PathVariable String id, ModelAndView maw) {
         maw.addObject("userRoleReqDto", userRoleService.getForUpdate(id));
         maw.addObject("userRoleId", id);
         maw.setViewName("user-role-update");
@@ -66,7 +67,8 @@ public class UserRoleController {
     }
 
     @PutMapping("/{id}")
-    public ModelAndView updateModel(@PathVariable String id, @Valid UserRoleReqDto userRoleReqDto,
+    @PreAuthorize("hasRole('ADMIN')")
+    public ModelAndView updateUserRole(@PathVariable String id, @Valid UserRoleReqDto userRoleReqDto,
                                     BindingResult bindingResult, ModelAndView maw) {
         if (bindingResult.hasErrors()) {
             maw.addObject("userRoleReqDto", userRoleReqDto);
@@ -82,6 +84,7 @@ public class UserRoleController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView deleteUserRole(@PathVariable String id, ModelAndView maw) {
         userRoleService.delete(id);
         maw.setViewName("redirect:/user-role");

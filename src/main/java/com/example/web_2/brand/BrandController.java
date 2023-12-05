@@ -5,6 +5,7 @@ import com.example.web_2.brand.dto.BrandReqDto;
 import com.example.web_2.brand.dto.BrandResDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -66,6 +67,7 @@ public class BrandController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView updateBrand(@PathVariable String id, @Valid BrandReqDto brandReqDto,
                                     BindingResult bindingResult, ModelAndView maw) {
         if (bindingResult.hasFieldErrors("name")) {
@@ -84,6 +86,7 @@ public class BrandController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView deleteBrand(@PathVariable String id, ModelAndView maw) {
         brandService.delete(id);
         maw.setViewName("redirect:/brand");
