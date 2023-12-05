@@ -86,7 +86,7 @@ public class BrandController {
         if (bindingResult.hasErrors()) {
             maw.addObject("brandReqDto", brandReqDto);
             maw.addObject("brandId", id);
-            maw.addObject(bindingResult);
+            maw.addObject("org.springframework.validation.BindingResult.brandReqDto", bindingResult);
             maw.setViewName("brand-update");
         } else {
             brandService.update(id, brandReqDto.getName());

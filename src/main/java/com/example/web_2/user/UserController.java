@@ -92,7 +92,7 @@ public class UserController {
             maw.addObject("userReqDto", userReqDto);
             maw.addObject("userId", id);
             maw.addObject("roles", userRoleService.allUserRoles());
-            maw.addObject(bindingResult);
+            maw.addObject("org.springframework.validation.BindingResult.userReqDto", bindingResult);
             maw.setViewName("user-update");
         } else {
             userService.update(id, userReqDto);
