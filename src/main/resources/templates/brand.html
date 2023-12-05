@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head}"><title>Web App</title></head>
+<body class="d-flex flex-column h-100">
+<div th:replace="~{fragments/navbar}">Navbar</div>
+<main class="flex-shrink-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <main class="jumbotron text-center rounded col-md-12 align-self-center pt-5">
+                <div class="justify-content-center text-center">
+                    <h1>Brand Details</h1>
+                </div>
+                <div class="row bg-light rounded">
+                    <div class="col-md-6"><img src="/pic/brand-image.png" height="350px" alt="image"></div>
+                    <div class="col-md-6 pt-3">
+                        <h2>Brand</h2>
+                        <h4 th:text="'Id: ' + ${brand.id}"></h4>
+                        <h4 th:text="'Name: ' + ${brand.name}"></h4>
+                        <h4 th:text="'Created: ' + ${brand.createdAsString}"></h4>
+                        <h4 th:text="'Modified: ' + ${brand.modifiedAsString}"></h4>
+                        <div class="d-flex justify-content-center align-bottom mb-3">
+                            <form th:action="@{/brand/update/{id}(id=${brand.id})}" th:method="get">
+                                <button type="submit" class="btn btn-success align-bottom">
+                                    Update Brand
+                                </button>
+                            </form>
+                            <form th:action="@{/brand/{id}(id=${brand.id})}" th:method="post">
+                                <input type="hidden" name="_method" value="DELETE"/>
+                                <button type="submit" class="btn btn-danger align-bottom">
+                                    Delete Brand
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer}"></footer>
+</body>
+</html>

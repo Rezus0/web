@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head}"><title>Web App</title></head>
+<body class="d-flex flex-column h-100">
+<div th:replace="~{fragments/navbar}">Navbar</div>
+<main class="flex-shrink-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <main class="jumbotron text-center rounded col-md-12 align-self-center pt-5">
+                <div class="justify-content-center">
+                    <h1>Model Details</h1>
+                </div>
+                <div class="row bg-light rounded">
+                    <div class="col-md-6"><img src="/pic/car.png" height="350px" alt="image"></div>
+                    <div class="col-md-6 pt-3">
+                        <h2>Model</h2>
+                        <h4 th:text="'Id: ' + ${model.id}"></h4>
+                        <h4 th:text="'Name: ' + ${model.name}"></h4>
+                        <h4 th:text="'Category: ' + ${model.category}"></h4>
+                        <h4 th:text="'Image URL: ' + ${model.imageUrl}"></h4>
+                        <h4 th:text="'Start Year: ' + ${model.startYear}"></h4>
+                        <h4 th:text="'End Year: ' + ${model.endYear}"></h4>
+                        <h4 th:text="'Brand Id: ' + ${model.brand.id}"></h4>
+                        <h4 th:text="'Created: ' + ${model.createdAsString}"></h4>
+                        <h4 th:text="'Modified: ' + ${model.modifiedAsString}"></h4>
+                        <div class="d-flex justify-content-center align-bottom mb-3">
+                            <form th:action="@{/model/update/{id}(id=${model.id})}" th:method="get">
+                                <button type="submit" class="btn btn-success align-bottom">
+                                    Update Model
+                                </button>
+                            </form>
+                            <form th:action="@{/model/{id}(id=${model.id})}"
+                                  th:method="post">
+                                <input type="hidden" name="_method" value="DELETE"/>
+                                <button type="submit" class="btn btn-danger align-bottom">
+                                    Delete Model
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer}"></footer>
+</body>
+</html>

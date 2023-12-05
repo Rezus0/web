@@ -1,0 +1,14 @@
+body {
+    font-family: Arial, sans-serif;
+}
+.brand-item {
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 20px;
+    font-family: Arial, sans-serif;
+}
+.pagination {
+    font-size: 25px;
+    font-family: Arial, sans-serif;
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head}"><title>Web App</title></head>
+<body class="d-flex flex-column h-100">
+<div th:replace="~{fragments/navbar}">Navbar</div>
+<main class="flex-shrink-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <main class="jumbotron text-center rounded col-md-12 align-self-center pt-5">
+                <div class="justify-content-center">
+                    <h1>User Details</h1>
+                </div>
+                <div class="row bg-light rounded">
+                    <div class="col-md-6"><img src="/pic/profile.png" height="350px" alt="image"></div>
+                    <div class="col-md-6 pt-3">
+                        <h2>User</h2>
+                        <h4 th:text="'Id: ' + ${user.id}"></h4>
+                        <h4 th:text="'Username: ' + ${user.username}"></h4>
+                        <h4 th:text="'Password: ' + ${user.password}"></h4>
+                        <h4 th:text="'First Name: ' + ${user.firstName}"></h4>
+                        <h4 th:text="'Last Name: ' + ${user.lastName}"></h4>
+                        <h4 th:text="'Is Active: ' + ${user.active}"></h4>
+                        <h4 th:text="'Role: ' + ${user.role.name}"></h4>
+                        <h4 th:text="'Image URL: ' + ${user.imageUrl}"></h4>
+                        <h4 th:text="'Created: ' + ${user.createdAsString}"></h4>
+                        <h4 th:text="'Modified: ' + ${user.modifiedAsString}"></h4>
+                        <div class="d-flex justify-content-center align-bottom mb-3">
+                            <form th:action="@{/user/update/{id}(id=${user.id})}" th:method="get">
+                                <button type="submit" class="btn btn-success align-bottom">
+                                    Update User
+                                </button>
+                            </form>
+                            <form th:action="@{/user/{id}(id=${user.id})}"
+                                  th:method="post">
+                                <input type="hidden" name="_method" value="DELETE"/>
+                                <button type="submit" class="btn btn-danger align-bottom">
+                                    Delete User
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer}"></footer>
+</body>
+</html>

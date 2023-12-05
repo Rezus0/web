@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head}"><title>Web App</title></head>
+<body class="d-flex flex-column h-100">
+<div th:replace="~{fragments/navbar}">Navbar</div>
+<main class="flex-shrink-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <main class="jumbotron text-center rounded col-md-12 align-self-center pt-5">
+                <div class="justify-content-center">
+                    <h1>Offer Details</h1>
+                </div>
+                <div class="row bg-light rounded">
+                    <div class="col-md-6"><img src="/pic/email.png" height="350px" alt="image"></div>
+                    <div class="col-md-6 pt-3">
+                        <h2>Offer</h2>
+                        <h4 th:text="'Id: ' + ${offer.id}"></h4>
+                        <h4 th:text="'Description: ' + ${offer.description}"></h4>
+                        <h4 th:text="'Category: ' + ${offer.engine}"></h4>
+                        <h4 th:text="'Image URL: ' + ${offer.imageUrl}"></h4>
+                        <h4 th:text="'Mileage: ' + ${offer.mileage}"></h4>
+                        <h4 th:text="'Price: ' + ${offer.price}"></h4>
+                        <h4 th:text="'Transmission: ' + ${offer.transmission}"></h4>
+                        <h4 th:text="'Year: ' + ${offer.year}"></h4>
+                        <h4 th:text="'Model Id: ' + ${offer.model.id}"></h4>
+                        <h4 th:text="'Seller Id: ' + ${offer.seller.id}"></h4>
+                        <h4 th:text="'Created: ' + ${offer.createdAsString}"></h4>
+                        <h4 th:text="'Modified: ' + ${offer.modifiedAsString}"></h4>
+                        <div class="d-flex justify-content-center align-bottom mb-3">
+                            <form th:action="@{/offer/update/{id}(id=${offer.id})}" th:method="get">
+                                <button type="submit" class="btn btn-success align-bottom">
+                                    Update Offer
+                                </button>
+                            </form>
+                            <form th:action="@{/offer/{id}(id=${offer.id})}"
+                                  th:method="post">
+                                <input type="hidden" name="_method" value="DELETE"/>
+                                <button type="submit" class="btn btn-danger align-bottom">
+                                    Delete Offer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer}"></footer>
+</body>
+</html>

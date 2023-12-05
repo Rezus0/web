@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head}">
+    <title>Web App</title>
+</head>
+<body class="d-flex flex-column h-100">
+<div th:replace="~{fragments/navbar}">Navbar</div>
+<main class="flex-shrink-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="jumbotron text-center rounded col-md-8 align-self-center">
+                <h1 class="text-center text-dark mt-3 mb-4">All Brands</h1>
+                <div class='row mb-4 d-flex justify-content-around'>
+                    <div th:each="b : ${brandPage.brands}" class="d-flex flex-column bg-text mb-3 rounded">
+                        <h3 th:text="'Name: ' + *{b.name}"></h3>
+                        <h4><a class="btn-block" th:href="@{/brand/{id}(id=*{b.id})}">Detail info</a></h4>
+                    </div>
+                </div>
+                <div class="col-md-12 text-center mt-2 mb-3">
+                    <h5>
+                        <span th:text="'Page '"></span>
+                        <strong th:text="${brandPage.page}"></strong>
+                        <span th:text="' of '"></span>
+                        <strong class="text" th:text="${brandPage.totalPages}"></strong>
+                    </h5>
+                    <div class="btn-group" role="group" aria-label="Pagination">
+                        <a th:if="${brandPage.page > 1}" class="btn btn-secondary" th:href="@{/brand(page=${brandPage.page - 1})}">&lt; Previous</a>
+                        <a th:if="${brandPage.page < brandPage.totalPages}" class="btn btn-secondary" th:href="@{/brand(page=${brandPage.page + 1})}">Next &gt;</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer}"></footer>
+</body>
+</html>
