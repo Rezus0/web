@@ -4,6 +4,7 @@ import com.example.web_2.model.ModelService;
 import com.example.web_2.offer.dto.OfferPageResDto;
 import com.example.web_2.offer.dto.OfferReqDto;
 import com.example.web_2.offer.dto.OfferResDto;
+import com.example.web_2.offer.dto.UserOffersView;
 import com.example.web_2.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,14 @@ public class OfferController {
         OfferResDto offer = offerService.getById(id);
         maw.addObject("offer", offer);
         maw.setViewName("offer");
+        return maw;
+    }
+
+    @GetMapping("/for-user/{userId}")
+    public ModelAndView getOffersForUser(@PathVariable String userId, ModelAndView maw) {
+        UserOffersView userOffersView = offerService.getOffersForUser(userId);
+        maw.addObject("userOffersView", userOffersView);
+        maw.setViewName("user-offers");
         return maw;
     }
 

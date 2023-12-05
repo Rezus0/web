@@ -6,6 +6,7 @@ import com.example.web_2.model.exception.ModelNotFoundException;
 import com.example.web_2.offer.dto.OfferPageResDto;
 import com.example.web_2.offer.dto.OfferReqDto;
 import com.example.web_2.offer.dto.OfferResDto;
+import com.example.web_2.offer.dto.UserOffersView;
 import com.example.web_2.offer.exception.OfferNotFoundException;
 import com.example.web_2.user.User;
 import com.example.web_2.user.UserRepository;
@@ -73,6 +74,18 @@ public class OfferServiceImpl implements OfferService {
             throw new OfferNotFoundException(String.format("Offer with id \"%s\" not found", id));
         }
         return mapper.map(optionalOffer.get(), OfferReqDto.class);
+    }
+
+    @Override
+    public UserOffersView getOffersForUser(String userId) {
+        Optional<User> optionalUser = userRepository.findById(UUID.fromString(userId));
+        if (optionalUser.isEmpty())
+            throw new UserNotFoundException(String.format("User with id \"%s\" not found", userId));
+        User user = optionalUser.get();
+        List<OfferResDto> offers = user.getOffers().stream()
+                .map(offer -> mapper.map(offer, OfferResDto.class))
+                .toList();
+        return new UserOffersView(user.getFirstName(), user.getLastName(), user.getUsername(), offers);
     }
 
     @Override
