@@ -67,7 +67,10 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalUser = userRepository.findById(UUID.fromString(id));
         if (optionalUser.isEmpty())
             throw new UserNotFoundException(String.format("User with id \"%s\" not found", id));
-        return mapper.map(optionalUser.get(), UserReqDto.class);
+        User user = optionalUser.get();
+        UserReqDto userReqDto = mapper.map(user, UserReqDto.class);
+        userReqDto.setRoleIdentifier(user.getRole().getId().toString());
+        return userReqDto;
     }
 
     @Override

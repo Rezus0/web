@@ -137,7 +137,8 @@
                                 id="model" name="name" th:field="*{modelIdentifier}">
                             <option th:each="m : ${models}"
                                     th:value="${m.id}"
-                                    th:text="${m.name}">Model's name
+                                    th:text="${m.name}"
+                                    th:selected="${m.id} == *{modelIdentifier}">Model's name
                             </option>
                         </select>
                         <small th:if="${#fields.hasErrors('modelIdentifier')}" th:errors="*{modelIdentifier}"
@@ -150,7 +151,8 @@
                                 id="seller" name="name" th:field="*{sellerIdentifier}">
                             <option th:each="s : ${sellers}"
                                     th:value="${s.id}"
-                                    th:text="${s.username}">Seller's username
+                                    th:text="${s.username}"
+                                    th:selected="${s.id} == *{sellerIdentifier}">Seller's username
                             </option>
                         </select>
                         <small th:if="${#fields.hasErrors('sellerIdentifier')}" th:errors="*{sellerIdentifier}"

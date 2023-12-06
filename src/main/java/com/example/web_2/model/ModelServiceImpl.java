@@ -65,7 +65,10 @@ public class ModelServiceImpl implements ModelService {
         Optional<Model> optionalModel = modelRepository.findById(UUID.fromString(id));
         if (optionalModel.isEmpty())
             throw new ModelNotFoundException(String.format("Model with id \"%s\" not found", id));
-        return mapper.map(optionalModel.get(), ModelReqDto.class);
+        Model model = optionalModel.get();
+        ModelReqDto modelReqDto = mapper.map(optionalModel.get(), ModelReqDto.class);
+        modelReqDto.setBrandIdentifier(model.getBrand().getId().toString());
+        return modelReqDto;
     }
 
     @Override

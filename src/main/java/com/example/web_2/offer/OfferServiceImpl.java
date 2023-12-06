@@ -73,7 +73,11 @@ public class OfferServiceImpl implements OfferService {
         if (optionalOffer.isEmpty()) {
             throw new OfferNotFoundException(String.format("Offer with id \"%s\" not found", id));
         }
-        return mapper.map(optionalOffer.get(), OfferReqDto.class);
+        Offer offer = optionalOffer.get();
+        OfferReqDto offerReqDto = mapper.map(optionalOffer.get(), OfferReqDto.class);
+        offerReqDto.setModelIdentifier(offer.getModel().getId().toString());
+        offerReqDto.setSellerIdentifier(offer.getSeller().getId().toString());
+        return offerReqDto;
     }
 
     @Override

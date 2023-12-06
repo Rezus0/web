@@ -100,10 +100,11 @@
                     <div class="mb-3">
                         <label class="form-label" for="brand"><h5>All available brands</h5></label>
                         <select multiple="false" class="form-control text-center"
-                                id="brand" name="name" th:field="*{brandIdentifier}">
+                                id="brand" name="name" th:value="*{brandIdentifier}">
                             <option th:each="b : ${brands}"
                                     th:value="${b.id}"
-                                    th:text="${b.name}">
+                                    th:text="${b.name}"
+                                    th:selected="${b.id} == *{brandIdentifier}">
                                 Brand name
                             </option>
                         </select>
