@@ -15,6 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,6 +55,20 @@ public class UserServiceImpl implements UserService {
                 .map(user -> mapper.map(user, UserResDto.class))
                 .toList();
         return new UserPageResDto(pageNumber, totalPages, pageSize, list);
+    }
+
+    @Override
+    public BindingResult validateUniqueName(String id, UserReqDto userReqDto, BindingResult bindingResult) {
+        List<FieldError> errorsToKeep = bindingResult.getFieldErrors().stream()
+                .filter(fieldError -> !("Username already exists!").equals(fieldError.getDefaultMessage()) ||
+                        !getById(id).getUsername().equals(fieldError.getRejectedValue()))
+                .toList();
+        bindingResult = new BeanPropertyBindingResult(userReqDto, "userReqDto");
+        for (FieldError e:
+                errorsToKeep) {
+            bindingResult.addError(e);
+        }
+        return bindingResult;
     }
 
     @Override

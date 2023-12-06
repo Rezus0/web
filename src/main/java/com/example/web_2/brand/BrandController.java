@@ -6,13 +6,9 @@ import com.example.web_2.brand.dto.BrandResDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/brand")
@@ -73,15 +69,7 @@ public class BrandController {
     public ModelAndView updateBrand(@PathVariable String id, @Valid BrandReqDto brandReqDto,
                                     BindingResult bindingResult, ModelAndView maw) {
         if (bindingResult.hasFieldErrors("name")) {
-            List<FieldError> errorsToKeep = bindingResult.getFieldErrors().stream()
-                    .filter(fieldError -> !("Brand name already exists!").equals(fieldError.getDefaultMessage()) ||
-                            !brandService.getById(id).getName().equals(fieldError.getRejectedValue()))
-                    .toList();
-            bindingResult = new BeanPropertyBindingResult(brandReqDto, "userReqDto");
-            for (FieldError e:
-                    errorsToKeep) {
-                bindingResult.addError(e);
-            }
+            bindingResult = brandService.validateUniqueName(id, brandReqDto, bindingResult);
         }
         if (bindingResult.hasErrors()) {
             maw.addObject("brandReqDto", brandReqDto);

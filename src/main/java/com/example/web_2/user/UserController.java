@@ -7,13 +7,9 @@ import com.example.web_2.user.user_role.UserRoleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/user")
@@ -78,15 +74,7 @@ public class UserController {
     public ModelAndView updateUser(@PathVariable String id, @Valid UserReqDto userReqDto,
                                     BindingResult bindingResult, ModelAndView maw) {
         if (bindingResult.hasFieldErrors("username")) {
-            List<FieldError> errorsToKeep = bindingResult.getFieldErrors().stream()
-                    .filter(fieldError -> !("Username already exists!").equals(fieldError.getDefaultMessage()) ||
-                            !userService.getById(id).getUsername().equals(fieldError.getRejectedValue()))
-                    .toList();
-            bindingResult = new BeanPropertyBindingResult(userReqDto, "userReqDto");
-            for (FieldError e:
-                 errorsToKeep) {
-                bindingResult.addError(e);
-            }
+            bindingResult = userService.validateUniqueName(id, userReqDto, bindingResult);
         }
         if (bindingResult.hasErrors()) {
             maw.addObject("userReqDto", userReqDto);
