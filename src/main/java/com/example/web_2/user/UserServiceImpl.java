@@ -1,10 +1,9 @@
 package com.example.web_2.user;
 
-import com.example.web_2.user.dto.UserPageResDto;
-import com.example.web_2.user.dto.UserReqDto;
-import com.example.web_2.user.dto.UserResDto;
+import com.example.web_2.user.dto.*;
 import com.example.web_2.user.exception.UserAlreadyExistsException;
 import com.example.web_2.user.exception.UserNotFoundException;
+import com.example.web_2.user.user_role.Role;
 import com.example.web_2.user.user_role.UserRole;
 import com.example.web_2.user.user_role.UserRoleRepository;
 import com.example.web_2.user.user_role.exception.UserRoleNotFoundException;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -30,9 +30,11 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private UserRoleRepository userRoleRepository;
     private final ModelMapper mapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(ModelMapper mapper) {
+    public UserServiceImpl(ModelMapper mapper, PasswordEncoder passwordEncoder) {
         this.mapper = mapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -91,10 +93,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResDto register(UserRegDto userRegDto) {
+        userRegDto.setPassword(passwordEncoder.encode(userRegDto.getPassword()));
+        User user = mapper.map(userRegDto, User.class);
+        String username = userRegDto.getUsername();
+        if (userRepository.findUserByUsername(username).isPresent())
+            throw new UserAlreadyExistsException(String.format("Username \"%s\" already exists", username));
+        user.setRole(userRoleRepository.findFirstByName(Role.USER).orElseThrow());
+        user.setActive(false);
+        LocalDateTime current = LocalDateTime.now();
+        user.setCreated(current);
+        user.setModified(current);
+        userRepository.saveAndFlush(user);
+        return mapper.map(user, UserResDto.class);
+    }
+
+    @Override
+    public UserProfileView getUserProfile(String username) {
+        Optional<User> optionalUser = userRepository.findUserByUsername(username);
+        if (optionalUser.isEmpty())
+            throw new UserNotFoundException(String.format("User with username \"%s\" not found", username));
+        return mapper.map(optionalUser, UserProfileView.class);
+    }
+
+    @Override
     public UserResDto create(UserReqDto userReqDto) {
         String username = userReqDto.getUsername();
         if (userRepository.findUserByUsername(username).isPresent())
             throw new UserAlreadyExistsException(String.format("Username \"%s\" already exists", username));
+        userReqDto.setPassword(passwordEncoder.encode(userReqDto.getPassword()));
         User user = mapper.map(userReqDto, User.class);
         validateAndSetUserRole(user, userReqDto.getRoleIdentifier());
         user.setActive(false);
@@ -107,6 +134,7 @@ public class UserServiceImpl implements UserService {
 
     public List<UserResDto> create(List<UserReqDto> userReqDtos) {
         List<User> users = userReqDtos.stream().map(dto -> {
+            dto.setPassword(passwordEncoder.encode(dto.getPassword()));
             User user = mapper.map(dto, User.class);
             validateAndSetUserRole(user, dto.getRoleIdentifier());
             LocalDateTime current = LocalDateTime.now();
@@ -128,6 +156,7 @@ public class UserServiceImpl implements UserService {
         if (userForValidation.isPresent() && !userForValidation.get().getId().toString().equals(id))
             throw new UserAlreadyExistsException(String.format("Username \"%s\" already exists", username));
         User user = optionalUser.get();
+        userReqDto.setPassword(passwordEncoder.encode(userReqDto.getPassword()));
         mapper.map(userReqDto, user);
         validateAndSetUserRole(user, userReqDto.getRoleIdentifier());
         user.setModified(LocalDateTime.now());

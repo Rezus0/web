@@ -99,7 +99,7 @@
 
                     <div class="mb-3">
                         <label class="form-label" for="brand"><h5>All available brands</h5></label>
-                        <select multiple="false" class="form-control text-center"
+                        <select multiple="false" class="form-control text-center" th:errorclass="is-invalid"
                                 id="brand" name="name" th:value="*{brandIdentifier}">
                             <option th:each="b : ${brands}"
                                     th:value="${b.id}"

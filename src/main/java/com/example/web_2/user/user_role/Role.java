@@ -1,7 +1,6 @@
 package com.example.web_2.user.user_role;
 
 import com.example.web_2.user.user_role.exception.UserRoleNotFoundException;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Arrays;
 
@@ -14,7 +13,6 @@ public enum Role {
         this.value = value;
     }
 
-    @JsonValue
     public int getValue() {
         return value;
     }

@@ -56,9 +56,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="role"><h5>All available roles</h5></label>
-                        <select multiple="false" class="form-control text-center"
-                                id="role" name="role" th:value="*{roleIdentifier}">
+                        <label class="form-label" for="roleIdentifier"><h5>All available roles</h5></label>
+                        <select multiple="false" class="form-control text-center" th:errorclass="is-invalid"
+                                id="roleIdentifier" name="roleIdentifier" th:value="*{roleIdentifier}">
                             <option th:each="r : ${roles}"
                                     th:value="${r.id}"
                                     th:text="${r.name}"

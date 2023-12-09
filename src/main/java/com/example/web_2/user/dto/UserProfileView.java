@@ -1,14 +1,12 @@
 package com.example.web_2.user.dto;
 
-import com.example.web_2.baseEntity.BaseResDto;
 import com.example.web_2.user.user_role.dto.UserRoleResDto;
 
-public class UserResDto extends BaseResDto {
+public class UserProfileView {
     private String id;
     private String username;
     private String firstName;
     private String lastName;
-    private boolean isActive;
     private UserRoleResDto role;
     private String imageUrl;
 
@@ -42,14 +40,6 @@ public class UserResDto extends BaseResDto {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
     }
 
     public UserRoleResDto getRole() {

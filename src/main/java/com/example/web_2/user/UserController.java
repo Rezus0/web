@@ -11,6 +11,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/user")
 public class UserController {
@@ -26,6 +28,13 @@ public class UserController {
         UserPageResDto userPage = userService.getPage(page, pageSize);
         maw.addObject("userPage", userPage);
         maw.setViewName("user-page");
+        return maw;
+    }
+
+    @GetMapping("/profile")
+    public ModelAndView profile(Principal principal, ModelAndView maw) {
+        maw.addObject("userProfile", userService.getUserProfile(principal.getName()));
+        maw.setViewName("profile");
         return maw;
     }
 

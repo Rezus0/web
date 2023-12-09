@@ -34,3 +34,4 @@ build/
 
 /src/main/resources/application.properties
 /src/main/resources/questions.txt
+/src/main/java/com/example/web_2/DataInitializer.java
