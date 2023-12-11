@@ -1,5 +1,6 @@
 package com.example.web_2.user;
 
+import com.example.web_2.user.dto.ProfileUpdateDto;
 import com.example.web_2.user.dto.UserPageResDto;
 import com.example.web_2.user.dto.UserReqDto;
 import com.example.web_2.user.dto.UserResDto;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -39,6 +41,37 @@ public class UserController {
         return maw;
     }
 
+    @GetMapping("/profile/update")
+    public ModelAndView profileUpdate(Principal principal, ModelAndView maw) {
+        maw.addObject("profileUpdateDto", userService.getProfileForUpdate(principal.getName()));
+        maw.setViewName("profile-update");
+        return maw;
+    }
+
+    @PutMapping("/profile/update")
+    public ModelAndView profileUpdate(@Valid ProfileUpdateDto dto, BindingResult bindingResult,
+                                      Principal principal, ModelAndView maw) {
+        if (bindingResult.hasFieldErrors("username"))
+            bindingResult = userService.validateUniqueName(principal, dto, bindingResult, "profileUpdateDto");
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+            bindingResult.addError(new FieldError("userRegDto", "password",
+                    "Password and confirmation must match"));
+            bindingResult.addError(new FieldError("userRegDto", "confirmPassword",
+                    "Password and confirmation must match"));
+        }
+        bindingResult = userService.validateOldPassword(dto.getOldPassword(), principal.getName(), bindingResult);
+        if (bindingResult.hasErrors()) {
+            maw.addObject("profileUpdateDto", dto);
+            maw.addObject("org.springframework.validation.BindingResult.profileUpdateDto",
+                    bindingResult);
+            maw.setViewName("profile-update");
+        } else {
+            userService.updateUserProfile(dto, principal.getName());
+            maw.setViewName("redirect:/user/profile");
+        }
+        return maw;
+    }
+
     @GetMapping("/{id}")
     public ModelAndView getUserById(@PathVariable String id, ModelAndView maw) {
         UserResDto user = userService.getById(id);
@@ -57,7 +90,7 @@ public class UserController {
 
     @PostMapping("/add")
     public ModelAndView createUser(@Valid UserReqDto userReqDto, BindingResult bindingResult,
-                                    ModelAndView maw) {
+                                   ModelAndView maw) {
         if (bindingResult.hasErrors()) {
             maw.addObject("userReqDto", userReqDto);
             maw.addObject("roles", userRoleService.allUserRoles());
@@ -83,9 +116,9 @@ public class UserController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView updateUser(@PathVariable String id, @Valid UserReqDto userReqDto,
-                                    BindingResult bindingResult, ModelAndView maw) {
+                                   BindingResult bindingResult, ModelAndView maw) {
         if (bindingResult.hasFieldErrors("username")) {
-            bindingResult = userService.validateUniqueName(id, userReqDto, bindingResult);
+            bindingResult = userService.validateUniqueName(id, userReqDto, bindingResult, "userReqDto");
         }
         if (bindingResult.hasErrors()) {
             maw.addObject("userReqDto", userReqDto);

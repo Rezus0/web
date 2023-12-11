@@ -13,12 +13,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -31,10 +37,13 @@ public class UserServiceImpl implements UserService {
     private UserRoleRepository userRoleRepository;
     private final ModelMapper mapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
-    public UserServiceImpl(ModelMapper mapper, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(ModelMapper mapper, PasswordEncoder passwordEncoder,
+                           AuthenticationManager authenticationManager) {
         this.mapper = mapper;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -60,13 +69,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public BindingResult validateUniqueName(String id, UserReqDto userReqDto, BindingResult bindingResult) {
+    public BindingResult validateUniqueName(String id, BaseUserDto baseUserDto,
+                                            BindingResult bindingResult, String objectName) {
         List<FieldError> errorsToKeep = bindingResult.getFieldErrors().stream()
                 .filter(fieldError -> !("Username already exists!").equals(fieldError.getDefaultMessage()) ||
                         !getById(id).getUsername().equals(fieldError.getRejectedValue()))
                 .toList();
-        bindingResult = new BeanPropertyBindingResult(userReqDto, "userReqDto");
-        for (FieldError e:
+        bindingResult = new BeanPropertyBindingResult(baseUserDto, objectName);
+        for (FieldError e :
+                errorsToKeep) {
+            bindingResult.addError(e);
+        }
+        return bindingResult;
+    }
+
+    @Override
+    public BindingResult validateUniqueName(Principal principal, BaseUserDto baseUserDto,
+                                            BindingResult bindingResult, String objectName) {
+        List<FieldError> errorsToKeep = bindingResult.getFieldErrors().stream()
+                .filter(fieldError -> !("Username already exists!").equals(fieldError.getDefaultMessage()) ||
+                        !principal.getName().equals(baseUserDto.getUsername()))
+                .toList();
+        bindingResult = new BeanPropertyBindingResult(baseUserDto, objectName);
+        for (FieldError e :
                 errorsToKeep) {
             bindingResult.addError(e);
         }
@@ -88,12 +113,54 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(String.format("User with id \"%s\" not found", id));
         User user = optionalUser.get();
         UserReqDto userReqDto = mapper.map(user, UserReqDto.class);
+        userReqDto.setPassword("");
         userReqDto.setRoleIdentifier(user.getRole().getId().toString());
         return userReqDto;
     }
 
     @Override
-    public UserResDto register(UserRegDto userRegDto) {
+    public ProfileUpdateDto getProfileForUpdate(String username) {
+        Optional<User> optionalUser = userRepository.findUserByUsername(username);
+        if (optionalUser.isEmpty())
+            throw new UserNotFoundException(String.format("User with username \"%s\" not found", username));
+        ProfileUpdateDto profileUpdateDto = mapper.map(optionalUser.get(), ProfileUpdateDto.class);
+        profileUpdateDto.setPassword("");
+        return profileUpdateDto;
+    }
+
+    @Override
+    public BindingResult validateOldPassword(String oldPassword, String username, BindingResult bindingResult) {
+        Optional<User> optionalUser = userRepository.findUserByUsername(username);
+        if (optionalUser.isEmpty())
+            throw new UserNotFoundException(String.format("User with username \"%s\" not found", username));
+        String userPassword = optionalUser.get().getPassword();
+        if (!passwordEncoder.matches(oldPassword, userPassword)) {
+            bindingResult.addError(new FieldError("profileUpdateDto", "oldPassword",
+                    "Old password is invalid"));
+        }
+        return bindingResult;
+    }
+
+    @Override
+    public void updateUserProfile(ProfileUpdateDto dto, String username) {
+        dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+        Optional<User> optionalUser = userRepository.findUserByUsername(username);
+        if (optionalUser.isEmpty())
+            throw new UserNotFoundException(String.format("User with username \"%s\" not found", username));
+        String newUsername = dto.getUsername();
+        if (!username.equals(newUsername) && userRepository.findUserByUsername(newUsername).isPresent())
+            throw new UserAlreadyExistsException(String.format("Username \"%s\" already exists", newUsername));
+        User user = optionalUser.get();
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword()))
+            throw new IllegalArgumentException("Old password is invalid");
+        mapper.map(dto, user);
+        user.setModified(LocalDateTime.now());
+        userRepository.saveAndFlush(user);
+    }
+
+    @Override
+    public SecurityContext register(UserRegDto userRegDto) {
+        String rawPassword = userRegDto.getPassword();
         userRegDto.setPassword(passwordEncoder.encode(userRegDto.getPassword()));
         User user = mapper.map(userRegDto, User.class);
         String username = userRegDto.getUsername();
@@ -105,7 +172,11 @@ public class UserServiceImpl implements UserService {
         user.setCreated(current);
         user.setModified(current);
         userRepository.saveAndFlush(user);
-        return mapper.map(user, UserResDto.class);
+        Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, rawPassword);
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        SecurityContext ctx = SecurityContextHolder.getContext();
+        ctx.setAuthentication(authentication);
+        return ctx;
     }
 
     @Override

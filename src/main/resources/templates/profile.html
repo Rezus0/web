@@ -21,7 +21,7 @@
                         <h4 th:text="'Role: ' + ${userProfile.role.name}"></h4>
                         <h4 th:text="'Image URL: ' + ${userProfile.imageUrl}"></h4>
                         <div class="d-flex justify-content-center align-bottom mb-3">
-                            <form th:action="@{/user/update/{id}(id=${userProfile.id})}" th:method="get">
+                            <form th:action="@{/user/profile/update}" th:method="get">
                                 <button type="submit" class="btn btn-success align-bottom">
                                     Update Profile
                                 </button>

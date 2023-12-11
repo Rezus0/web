@@ -2,8 +2,10 @@ package com.example.web_2.baseEntity;
 
 import com.example.web_2.user.UserService;
 import com.example.web_2.user.dto.UserRegDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 @Controller
 @RequestMapping("/")
@@ -27,7 +31,8 @@ public class AuthController {
     }
 
     @PostMapping("register")
-    public ModelAndView register(@Valid UserRegDto userRegDto, BindingResult bindingResult, ModelAndView maw) {
+    public ModelAndView register(@Valid UserRegDto userRegDto, BindingResult bindingResult,
+                                 HttpServletRequest request, ModelAndView maw) {
         if (!userRegDto.getPassword().equals(userRegDto.getConfirmPassword())) {
             bindingResult.addError(new FieldError("userRegDto", "password",
                     "Password and confirmation must match"));
@@ -40,7 +45,8 @@ public class AuthController {
             maw.setViewName("register");
             return maw;
         }
-        userService.register(userRegDto);
+        SecurityContext ctx = userService.register(userRegDto);
+        request.getSession(true).setAttribute(SPRING_SECURITY_CONTEXT_KEY, ctx);
         maw.setViewName("redirect:/");
         return maw;
     }

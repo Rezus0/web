@@ -6,6 +6,9 @@ import com.example.web_2.user.user_role.Role;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -49,9 +52,12 @@ public class SecurityConfig {
                                         .permitAll()
                                         .requestMatchers("/brand", "/model")
                                         .permitAll()
-                                        .requestMatchers("/offer", "/user", "/user-role/**",
+                                        .requestMatchers(
+                                                "/offer", "/user", "/user-role/*",
                                                 "/offer/add", "/brand/add", "/model/add", "user/add",
-                                                "/brand/update", "/model/update", "/offer/update", "user/update")
+                                                "/brand/update/*", "/model/update/*",
+                                                "/offer/update/*", "user/update/*"
+                                        )
                                         .hasRole(Role.ADMIN.name())
                                         .anyRequest().authenticated()
                 )
@@ -76,6 +82,24 @@ public class SecurityConfig {
                                 securityContextRepository(securityContextRepository)
                 );
         return httpSecurity.build();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+            HttpSecurity httpSecurity, UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder)
+            throws Exception {
+        AuthenticationManagerBuilder builder = httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
+        builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+        return builder.build();
     }
 
     @Bean

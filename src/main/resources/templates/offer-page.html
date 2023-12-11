@@ -14,6 +14,7 @@
                         <h3 th:text="'Model Name: ' + *{o.model.name}"></h3>
                         <h3 th:text="'Seller Username: ' + *{o.seller.username}"></h3>
                         <h3 th:text="'Engine: ' + *{o.engine}"></h3>
+                        <h3 th:text="'Price: ' + *{o.price}"></h3>
                         <h4><a class="btn-block" th:href="@{/offer/{id}(id=*{o.id})}">Detail info</a></h4>
                     </div>
                 </div>
