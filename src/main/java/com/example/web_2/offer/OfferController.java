@@ -14,6 +14,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/offer")
 public class OfferController {
@@ -34,6 +36,7 @@ public class OfferController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@offerService.getById(#id).seller.id == authentication.principal.id.toString() or hasRole('ADMIN')")
     public ModelAndView getOfferById(@PathVariable String id, ModelAndView maw) {
         OfferResDto offer = offerService.getById(id);
         maw.addObject("offer", offer);
@@ -42,10 +45,36 @@ public class OfferController {
     }
 
     @GetMapping("/for-user/{userId}")
+    @PreAuthorize("#userId == authentication.principal.id.toString() or hasRole('ADMIN')")
     public ModelAndView getOffersForUser(@PathVariable String userId, ModelAndView maw) {
         UserOffersView userOffersView = offerService.getOffersForUser(userId);
         maw.addObject("userOffersView", userOffersView);
         maw.setViewName("user-offers");
+        return maw;
+    }
+
+    @GetMapping("/sign-up")
+    public ModelAndView signUpOffer(ModelAndView maw) {
+        maw.addObject("offerReqDto", new OfferReqDto());
+        maw.addObject("models", modelService.allModels());
+        maw.setViewName("offer-sign-up");
+        return maw;
+    }
+
+    @PostMapping("/sign-up")
+    public ModelAndView signUpOffer(@Valid OfferReqDto offerReqDto, BindingResult bindingResult,
+                                    Principal principal, ModelAndView maw) {
+        if (bindingResult.hasErrors() &&
+                !(bindingResult.getFieldErrors().size() == 1 && bindingResult.hasFieldErrors("sellerIdentifier"))) {
+            maw.addObject("offerReqDto", offerReqDto);
+            maw.addObject("models", modelService.allModels());
+            maw.addObject("org.springframework.validation.BindingResult.offerReqDto",
+                    bindingResult);
+            maw.setViewName("offer-sign-up");
+        } else {
+            String userId = offerService.signUpOffer(offerReqDto, principal.getName());
+            maw.setViewName(String.format("redirect:/offer/for-user/%s", userId));
+        }
         return maw;
     }
 

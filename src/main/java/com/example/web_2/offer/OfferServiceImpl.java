@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
+@Service("offerService")
 public class OfferServiceImpl implements OfferService {
 
     private OfferRepository offerRepository;
@@ -90,6 +90,21 @@ public class OfferServiceImpl implements OfferService {
                 .map(offer -> mapper.map(offer, OfferResDto.class))
                 .toList();
         return new UserOffersView(user.getFirstName(), user.getLastName(), user.getUsername(), offers);
+    }
+
+    @Override
+    public String signUpOffer(OfferReqDto offerReqDto, String username) {
+        Optional<User> optionalUser = userRepository.findUserByUsername(username);
+        if (optionalUser.isEmpty())
+            throw new UserNotFoundException(String.format("User with username \"%s\" not found", username));
+        String userId = optionalUser.get().getId().toString();
+        Offer offer = mapper.map(offerReqDto, Offer.class);
+        validateAndSetUserAndModel(offer, userId, offerReqDto.getModelIdentifier());
+        LocalDateTime current = LocalDateTime.now();
+        offer.setCreated(current);
+        offer.setModified(current);
+        offerRepository.saveAndFlush(offer);
+        return userId;
     }
 
     @Override

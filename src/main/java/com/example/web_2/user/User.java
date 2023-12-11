@@ -8,13 +8,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.BatchSize;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User extends BaseEntity {
-
+public class User extends BaseEntity implements UserDetails {
     private String username;
     private String password;
     private String firstName;
@@ -66,6 +69,36 @@ public class User extends BaseEntity {
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "seller")
     public List<Offer> getOffers() {
         return offers;
+    }
+
+    @Transient
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Transient
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Transient
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Transient
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Transient
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + getRole().getName().name()));
     }
 
     public void setUsername(String username) {

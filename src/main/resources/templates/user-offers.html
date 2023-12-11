@@ -23,6 +23,12 @@
                             <h4 th:text="'First Name: ' + ${userOffersView.firstName}"></h4>
                             <h4 th:text="'Last Name: ' + ${userOffersView.lastName}"></h4>
                         </div>
+                        <div>
+                            <a class="btn btn-success align-bottom"
+                               th:href="@{/offer/sign-up}">
+                                Sign Up a new Offer
+                            </a>
+                        </div>
                     </div>
                     <div class='row col-md-6 mt-2 d-flex justify-content-around'>
                         <div th:each="o : ${userOffersView.offers}" class="d-flex flex-column mb-2 bg-text rounded">

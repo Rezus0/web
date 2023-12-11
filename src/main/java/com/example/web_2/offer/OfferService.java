@@ -13,6 +13,7 @@ public interface OfferService {
     OfferResDto getById(String id);
     OfferReqDto getForUpdate(String id);
     UserOffersView getOffersForUser(String userId);
+    String signUpOffer(OfferReqDto offerReqDto, String username);
     OfferResDto create(OfferReqDto offerReqDto);
     List<OfferResDto> create(List<OfferReqDto> offerReqDtos);
     OfferResDto update(String id, OfferReqDto offerReqDto);
