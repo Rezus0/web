@@ -3,6 +3,7 @@ package com.example.web_2.model;
 import com.example.web_2.brand.Brand;
 import com.example.web_2.brand.BrandRepository;
 import com.example.web_2.brand.exception.BrandNotFoundException;
+import com.example.web_2.model.dto.BrandModelsView;
 import com.example.web_2.model.dto.ModelPageResDto;
 import com.example.web_2.model.dto.ModelReqDto;
 import com.example.web_2.model.dto.ModelResDto;
@@ -58,6 +59,18 @@ public class ModelServiceImpl implements ModelService {
         if (optionalModel.isEmpty())
             throw new ModelNotFoundException(String.format("Model with id \"%s\" not found", id));
         return mapper.map(optionalModel.get(), ModelResDto.class);
+    }
+
+    @Override
+    public BrandModelsView getModelsForBrand(String brandId) {
+        Optional<Brand> optionalBrand = brandRepository.findById(UUID.fromString(brandId));
+        if (optionalBrand.isEmpty())
+            throw new BrandNotFoundException(String.format("Brand with id \"%s\" not found", brandId));
+        Brand brand = optionalBrand.get();
+        List<ModelResDto> models = brand.getModels().stream()
+                .map(model -> mapper.map(model, ModelResDto.class))
+                .toList();
+        return new BrandModelsView(brand.getName(), models);
     }
 
     @Override

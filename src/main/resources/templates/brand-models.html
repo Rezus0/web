@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head}">
+    <title>Web App</title>
+</head>
+<body class="d-flex flex-column h-100">
+<div th:replace="~{fragments/navbar}">Navbar</div>
+<main class="flex-shrink-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <main class="jumbotron text-center rounded col-md-12 align-self-center pt-5">
+                <div class="justify-content-center">
+                    <h1>Brand's Models</h1>
+                </div>
+                <div class="row bg-light rounded">
+                    <div class="col-md-6 mt-2 d-flex flex-column align-items-center">
+                        <div>
+                            <img src="/pic/brand-image.png" height="300px" alt="image">
+                        </div>
+                        <div class="col-md-6 pt-3 text-center">
+                            <h4 th:text="'Name: ' + ${brandModelsView.name}"></h4>
+                        </div>
+                    </div>
+                    <div class='row col-md-6 mt-2 d-flex justify-content-around'>
+                        <div th:each="m : ${brandModelsView.models}" class="d-flex flex-column mb-2 bg-text rounded">
+                            <h3 th:text="'Name: ' + *{m.name}"></h3>
+                            <h3 th:text="'Category: ' + *{m.category}"></h3>
+                            <h4><a class="btn-block" th:href="@{/model/{id}(id=*{m.id})}">Detail info</a></h4>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer}"></footer>
+</body>
+</html>

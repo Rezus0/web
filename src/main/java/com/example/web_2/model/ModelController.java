@@ -1,6 +1,7 @@
 package com.example.web_2.model;
 
 import com.example.web_2.brand.BrandService;
+import com.example.web_2.model.dto.BrandModelsView;
 import com.example.web_2.model.dto.ModelPageResDto;
 import com.example.web_2.model.dto.ModelReqDto;
 import com.example.web_2.model.dto.ModelResDto;
@@ -35,6 +36,14 @@ public class ModelController {
         ModelResDto model = modelService.getById(id);
         maw.addObject("model", model);
         maw.setViewName("model");
+        return maw;
+    }
+
+    @GetMapping("/for-brand/{brandId}")
+    public ModelAndView getModelsForBrand(@PathVariable String brandId, ModelAndView maw) {
+        BrandModelsView brandModelsView = modelService.getModelsForBrand(brandId);
+        maw.addObject("brandModelsView", brandModelsView);
+        maw.setViewName("brand-models");
         return maw;
     }
 
