@@ -8,6 +8,10 @@ import com.example.web_2.brand.exception.BrandNotFoundException;
 import com.example.web_2.util.PaginationValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@EnableCaching
 public class BrandServiceImpl implements BrandService {
     private BrandRepository brandRepository;
     private final ModelMapper mapper;
@@ -31,6 +36,7 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
+    @Cacheable(cacheNames = "brands")
     public List<BrandResDto> allBrands() {
         return brandRepository.findAll()
                 .stream()
@@ -39,6 +45,7 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
+    @Cacheable(cacheNames = "brandPage", key = "#pageNumber + '-' + #pageSize")
     public BrandPageResDto getPage(int pageNumber, int pageSize) {
         long elementsCount = brandRepository.count();
         int totalPages = PaginationValidator
@@ -68,6 +75,7 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
+    @Cacheable(cacheNames = "brands", key = "#id")
     public BrandResDto getById(String id) {
         Optional<Brand> optionalBrand = brandRepository.findById(UUID.fromString(id));
         if (optionalBrand.isEmpty())
@@ -84,6 +92,15 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "brandPage", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "modelPage", allEntries = true),
+            @CacheEvict(cacheNames = "brandModels", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public BrandResDto create(String name) {
         BrandReqDto brandReqDto = new BrandReqDto();
         brandReqDto.setName(name);
@@ -97,6 +114,15 @@ public class BrandServiceImpl implements BrandService {
         return mapper.map(brand, BrandResDto.class);
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "brandPage", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "modelPage", allEntries = true),
+            @CacheEvict(cacheNames = "brandModels", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public List<BrandResDto> create(List<String> names) {
         List<BrandReqDto> brandReqDtos = names.stream().map(name -> {
                     BrandReqDto dto = new BrandReqDto();
@@ -116,6 +142,15 @@ public class BrandServiceImpl implements BrandService {
 
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "brandPage", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "modelPage", allEntries = true),
+            @CacheEvict(cacheNames = "brandModels", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public BrandResDto update(String id, String name) {
         BrandReqDto brandReqDto = new BrandReqDto();
         brandReqDto.setName(name);
@@ -130,6 +165,15 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "brandPage", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "modelPage", allEntries = true),
+            @CacheEvict(cacheNames = "brandModels", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public void delete(String id) {
         UUID uuid = UUID.fromString(id);
         if (brandRepository.findById(uuid).isEmpty())

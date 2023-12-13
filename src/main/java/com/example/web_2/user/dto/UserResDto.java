@@ -12,6 +12,9 @@ public class UserResDto extends BaseResDto {
     private UserRoleResDto role;
     private String imageUrl;
 
+    public UserResDto() {
+    }
+
     public String getId() {
         return id;
     }

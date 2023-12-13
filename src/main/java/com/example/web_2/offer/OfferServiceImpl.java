@@ -14,6 +14,10 @@ import com.example.web_2.user.exception.UserNotFoundException;
 import com.example.web_2.util.PaginationValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,8 +29,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service("offerService")
+@EnableCaching
 public class OfferServiceImpl implements OfferService {
-
     private OfferRepository offerRepository;
     private UserRepository userRepository;
     private ModelRepository modelRepository;
@@ -37,6 +41,7 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
+    @Cacheable(cacheNames = "offers")
     public List<OfferResDto> allOffers() {
         return offerRepository.findAll()
                 .stream()
@@ -45,6 +50,7 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
+    @Cacheable(cacheNames = "offerPage", key = "#pageNumber + '-' + #pageSize")
     public OfferPageResDto getPage(int pageNumber, int pageSize) {
         long elementsCount = offerRepository.count();
         int totalPages = PaginationValidator.validatePagination(pageNumber, pageSize, elementsCount);
@@ -59,6 +65,7 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
+    @Cacheable(cacheNames = "offers", key = "#id")
     public OfferResDto getById(String id) {
         Optional<Offer> optionalOffer = offerRepository.findById(UUID.fromString(id));
         if (optionalOffer.isEmpty()) {
@@ -81,6 +88,7 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
+    @Cacheable(cacheNames = "userOffers", key = "#userId")
     public UserOffersView getOffersForUser(String userId) {
         Optional<User> optionalUser = userRepository.findById(UUID.fromString(userId));
         if (optionalUser.isEmpty())
@@ -93,6 +101,14 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "offerPage", allEntries = true),
+            @CacheEvict(cacheNames = "userOffers", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public String signUpOffer(OfferReqDto offerReqDto, String username) {
         Optional<User> optionalUser = userRepository.findUserByUsername(username);
         if (optionalUser.isEmpty())
@@ -108,6 +124,14 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "offerPage", allEntries = true),
+            @CacheEvict(cacheNames = "userOffers", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public OfferResDto create(OfferReqDto offerReqDto) {
         Offer offer = mapper.map(offerReqDto, Offer.class);
         validateAndSetUserAndModel(offer, offerReqDto.getSellerIdentifier(), offerReqDto.getModelIdentifier());
@@ -118,6 +142,14 @@ public class OfferServiceImpl implements OfferService {
         return mapper.map(offer, OfferResDto.class);
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "offerPage", allEntries = true),
+            @CacheEvict(cacheNames = "userOffers", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public List<OfferResDto> create(List<OfferReqDto> offerReqDtos) {
         List<Offer> offers = offerReqDtos.stream().map(dto -> {
             Offer offer = mapper.map(dto, Offer.class);
@@ -132,6 +164,14 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "offerPage", allEntries = true),
+            @CacheEvict(cacheNames = "userOffers", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public OfferResDto update(String id, OfferReqDto offerReqDto) {
         Optional<Offer> optionalOffer = offerRepository.findById(UUID.fromString(id));
         if (optionalOffer.isEmpty())
@@ -145,6 +185,14 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "offerPage", allEntries = true),
+            @CacheEvict(cacheNames = "userOffers", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public void delete(String id) {
         UUID uuid = UUID.fromString(id);
         if (offerRepository.findById(uuid).isEmpty())

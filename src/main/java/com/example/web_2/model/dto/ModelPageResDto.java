@@ -8,6 +8,9 @@ public class ModelPageResDto {
     private int pageSize;
     private List<ModelResDto> models;
 
+    public ModelPageResDto() {
+    }
+
     public ModelPageResDto(int page, int totalPages, int pageSize, List<ModelResDto> models) {
         this.page = page;
         this.totalPages = totalPages;

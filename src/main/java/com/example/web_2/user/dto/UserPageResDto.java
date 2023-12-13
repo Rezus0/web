@@ -8,6 +8,9 @@ public class UserPageResDto {
     private int pageSize;
     private List<UserResDto> users;
 
+    public UserPageResDto() {
+    }
+
     public UserPageResDto(int page, int totalPages, int pageSize, List<UserResDto> users) {
         this.page = page;
         this.totalPages = totalPages;

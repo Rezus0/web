@@ -6,6 +6,9 @@ public class BrandResDto extends BaseResDto {
     private String id;
     private String name;
 
+    public BrandResDto() {
+    }
+
     public String getId() {
         return id;
     }

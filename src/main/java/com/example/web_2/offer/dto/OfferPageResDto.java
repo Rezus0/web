@@ -8,6 +8,9 @@ public class OfferPageResDto {
     private int pageSize;
     private List<OfferResDto> offers;
 
+    public OfferPageResDto() {
+    }
+
     public OfferPageResDto(int page, int totalPages, int pageSize, List<OfferResDto> offers) {
         this.page = page;
         this.totalPages = totalPages;

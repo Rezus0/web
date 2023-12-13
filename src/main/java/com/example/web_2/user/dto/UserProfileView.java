@@ -10,6 +10,9 @@ public class UserProfileView {
     private UserRoleResDto role;
     private String imageUrl;
 
+    public UserProfileView() {
+    }
+
     public String getId() {
         return id;
     }

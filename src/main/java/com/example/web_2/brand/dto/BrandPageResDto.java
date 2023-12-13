@@ -1,8 +1,8 @@
 package com.example.web_2.brand.dto;
 
 import java.util.List;
-public class BrandPageResDto {
 
+public class BrandPageResDto {
     private int page;
     private int totalPages;
     private int pageSize;

@@ -11,6 +11,10 @@ import com.example.web_2.model.exception.ModelNotFoundException;
 import com.example.web_2.util.PaginationValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@EnableCaching
 public class ModelServiceImpl implements ModelService {
     private ModelRepository modelRepository;
     private BrandRepository brandRepository;
@@ -32,6 +37,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Cacheable(cacheNames = "models")
     public List<ModelResDto> allModels() {
         return modelRepository.findAll()
                 .stream()
@@ -40,6 +46,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Cacheable(cacheNames = "modelPage", key = "#pageNumber + '-' + #pageSize")
     public ModelPageResDto getPage(int pageNumber, int pageSize) {
         long elementsCount = modelRepository.count();
         int totalPages = PaginationValidator.validatePagination(pageNumber, pageSize, elementsCount);
@@ -54,6 +61,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Cacheable(cacheNames = "models", key = "#id")
     public ModelResDto getById(String id) {
         Optional<Model> optionalModel = modelRepository.findById(UUID.fromString(id));
         if (optionalModel.isEmpty())
@@ -62,6 +70,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Cacheable(cacheNames = "brandModels", key = "#brandId")
     public BrandModelsView getModelsForBrand(String brandId) {
         Optional<Brand> optionalBrand = brandRepository.findById(UUID.fromString(brandId));
         if (optionalBrand.isEmpty())
@@ -85,6 +94,14 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "modelPage", allEntries = true),
+            @CacheEvict(cacheNames = "brandModels", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public ModelResDto create(ModelReqDto modelReqDto) {
         Model model = mapper.map(modelReqDto, Model.class);
         validateAndSetBrand(model, modelReqDto.getBrandIdentifier());
@@ -95,6 +112,14 @@ public class ModelServiceImpl implements ModelService {
         return mapper.map(model, ModelResDto.class);
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "modelPage", allEntries = true),
+            @CacheEvict(cacheNames = "brandModels", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public List<ModelResDto> create(List<ModelReqDto> modelReqDtos) {
         List<Model> models = modelReqDtos.stream().map(dto -> {
             Model model = mapper.map(dto, Model.class);
@@ -109,6 +134,14 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "modelPage", allEntries = true),
+            @CacheEvict(cacheNames = "brandModels", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public ModelResDto update(String id, ModelReqDto modelReqDto) {
         Optional<Model> optionalModel = modelRepository.findById(UUID.fromString(id));
         if (optionalModel.isEmpty())
@@ -122,6 +155,14 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "modelPage", allEntries = true),
+            @CacheEvict(cacheNames = "brandModels", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "users", allEntries = true)
+    })
     public void delete(String id) {
         UUID uuid = UUID.fromString(id);
         if (modelRepository.findById(uuid).isEmpty())

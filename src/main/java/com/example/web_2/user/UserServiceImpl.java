@@ -10,6 +10,10 @@ import com.example.web_2.user.user_role.exception.UserRoleNotFoundException;
 import com.example.web_2.util.PaginationValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -31,6 +35,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@EnableCaching
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
@@ -47,6 +52,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(cacheNames = "users")
     public List<UserResDto> allUsers() {
         return userRepository.findAll()
                 .stream()
@@ -55,6 +61,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(cacheNames = "userPage", key = "#pageNumber + '-' + #pageSize")
     public UserPageResDto getPage(int pageNumber, int pageSize) {
         long elementsCount = userRepository.count();
         int totalPages = PaginationValidator.validatePagination(pageNumber, pageSize, elementsCount);
@@ -99,6 +106,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(cacheNames = "users", key = "#id")
     public UserResDto getById(String id) {
         Optional<User> optionalUser = userRepository.findById(UUID.fromString(id));
         if (optionalUser.isEmpty())
@@ -142,6 +150,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "users", allEntries = true),
+            @CacheEvict(cacheNames = "userPage", allEntries = true),
+            @CacheEvict(cacheNames = "profile", allEntries = true),
+            @CacheEvict(cacheNames = "userOffers", allEntries = true),
+            @CacheEvict(cacheNames = "offerPage", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true)
+    })
     public void updateUserProfile(ProfileUpdateDto dto, String username) {
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
         Optional<User> optionalUser = userRepository.findUserByUsername(username);
@@ -159,6 +177,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "users", allEntries = true),
+            @CacheEvict(cacheNames = "userPage", allEntries = true),
+            @CacheEvict(cacheNames = "profile", allEntries = true),
+            @CacheEvict(cacheNames = "userOffers", allEntries = true),
+            @CacheEvict(cacheNames = "offerPage", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true)
+    })
     public SecurityContext register(UserRegDto userRegDto) {
         String rawPassword = userRegDto.getPassword();
         userRegDto.setPassword(passwordEncoder.encode(userRegDto.getPassword()));
@@ -180,6 +208,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(cacheNames = "profile", key = "#username")
     public UserProfileView getUserProfile(String username) {
         Optional<User> optionalUser = userRepository.findUserByUsername(username);
         if (optionalUser.isEmpty())
@@ -188,6 +217,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "users", allEntries = true),
+            @CacheEvict(cacheNames = "userPage", allEntries = true),
+            @CacheEvict(cacheNames = "profile", allEntries = true),
+            @CacheEvict(cacheNames = "userOffers", allEntries = true),
+            @CacheEvict(cacheNames = "offerPage", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true)
+    })
     public UserResDto create(UserReqDto userReqDto) {
         String username = userReqDto.getUsername();
         if (userRepository.findUserByUsername(username).isPresent())
@@ -203,6 +242,16 @@ public class UserServiceImpl implements UserService {
         return mapper.map(user, UserResDto.class);
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "users", allEntries = true),
+            @CacheEvict(cacheNames = "userPage", allEntries = true),
+            @CacheEvict(cacheNames = "profile", allEntries = true),
+            @CacheEvict(cacheNames = "userOffers", allEntries = true),
+            @CacheEvict(cacheNames = "offerPage", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true)
+    })
     public List<UserResDto> create(List<UserReqDto> userReqDtos) {
         List<User> users = userReqDtos.stream().map(dto -> {
             dto.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -218,6 +267,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "users", allEntries = true),
+            @CacheEvict(cacheNames = "userPage", allEntries = true),
+            @CacheEvict(cacheNames = "profile", allEntries = true),
+            @CacheEvict(cacheNames = "userOffers", allEntries = true),
+            @CacheEvict(cacheNames = "offerPage", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true)
+    })
     public UserResDto update(String id, UserReqDto userReqDto) {
         Optional<User> optionalUser = userRepository.findById(UUID.fromString(id));
         if (optionalUser.isEmpty())
@@ -236,6 +295,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "users", allEntries = true),
+            @CacheEvict(cacheNames = "userPage", allEntries = true),
+            @CacheEvict(cacheNames = "profile", allEntries = true),
+            @CacheEvict(cacheNames = "userOffers", allEntries = true),
+            @CacheEvict(cacheNames = "offerPage", allEntries = true),
+            @CacheEvict(cacheNames = "offers", allEntries = true),
+            @CacheEvict(cacheNames = "models", allEntries = true),
+            @CacheEvict(cacheNames = "brands", allEntries = true)
+    })
     public void delete(String id) {
         UUID uuid = UUID.fromString(id);
         if (userRepository.findById(uuid).isEmpty())
