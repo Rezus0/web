@@ -27,9 +27,11 @@
                     </h5>
                     <div class="btn-group" role="group" aria-label="Pagination">
                         <a th:if="${offerPage.page > 1}" class="btn btn-secondary"
-                           th:href="@{/offer(page=${offerPage.page - 1}, pageSize=${offerPage.pageSize})}">&lt; Previous</a>
+                           th:href="@{/offer(page=${offerPage.page - 1}, pageSize=${offerPage.pageSize},
+                            sortByPrice=${sortByPrice})}">&lt; Previous</a>
                         <a th:if="${offerPage.page < offerPage.totalPages}" class="btn btn-secondary"
-                           th:href="@{/offer(page=${offerPage.page + 1}, pageSize=${offerPage.pageSize})}">Next &gt;</a>
+                           th:href="@{/offer(page=${offerPage.page + 1}, pageSize=${offerPage.pageSize},
+                           sortByPrice=${sortByPrice})}">Next &gt;</a>
                     </div>
                 </div>
             </div>

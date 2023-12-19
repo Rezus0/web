@@ -50,12 +50,26 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
-    @Cacheable(cacheNames = "offerPage", key = "#pageNumber + '-' + #pageSize")
-    public OfferPageResDto getPage(int pageNumber, int pageSize) {
+    @Cacheable(cacheNames = "offerPage", key = "#pageNumber + '-' + #pageSize + '-' + #sortByPrice")
+    public OfferPageResDto getPage(int pageNumber, int pageSize, String sortByPrice) {
         long elementsCount = offerRepository.count();
         int totalPages = PaginationValidator.validatePagination(pageNumber, pageSize, elementsCount);
-        Page<Offer> page = offerRepository.findAll(PageRequest.of(pageNumber - 1, pageSize,
-                Sort.by("modified").descending()));
+        Page<Offer> page;
+        if (sortByPrice == null) {
+            page = offerRepository.findAll(PageRequest.of(pageNumber - 1, pageSize,
+                    Sort.by("modified").descending()));
+        } else {
+            if (sortByPrice.equalsIgnoreCase("asc")) {
+                page = offerRepository.findAll(PageRequest.of(pageNumber - 1, pageSize,
+                        Sort.by("price").ascending()));
+            } else if (sortByPrice.equalsIgnoreCase("desc")) {
+                page = offerRepository.findAll(PageRequest.of(pageNumber - 1, pageSize,
+                        Sort.by("price").descending()));
+            } else {
+                page = offerRepository.findAll(PageRequest.of(pageNumber - 1, pageSize,
+                        Sort.by("modified").descending()));
+            }
+        }
         List<OfferResDto> list = page
                 .getContent()
                 .stream()

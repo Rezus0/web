@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface OfferService {
     List<OfferResDto> allOffers();
-    OfferPageResDto getPage(int pageNumber, int pageSize);
+    OfferPageResDto getPage(int pageNumber, int pageSize, String sortByPrice);
     OfferResDto getById(String id);
     OfferReqDto getForUpdate(String id);
     UserOffersView getOffersForUser(String userId);

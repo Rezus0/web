@@ -6,6 +6,9 @@ import com.example.web_2.user.dto.UserReqDto;
 import com.example.web_2.user.dto.UserResDto;
 import com.example.web_2.user.user_role.UserRoleService;
 import jakarta.validation.Valid;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -21,6 +24,7 @@ import java.security.Principal;
 public class UserController {
     private UserService userService;
     private UserRoleService userRoleService;
+    private final static Logger LOG = LogManager.getLogger(Controller.class);
 
     @GetMapping
     public ModelAndView getUserPage(
@@ -28,7 +32,9 @@ public class UserController {
             @RequestParam(defaultValue = "5") int pageSize,
             ModelAndView maw
     ) {
+        LOG.log(Level.INFO, String.format("Try to show user page %d of size %d", page, pageSize));
         UserPageResDto userPage = userService.getPage(page, pageSize);
+        LOG.log(Level.INFO, String.format("Show user page %d of %d", userPage.getPage(), userPage.getTotalPages()));
         maw.addObject("userPage", userPage);
         maw.setViewName("user-page");
         return maw;
@@ -36,6 +42,7 @@ public class UserController {
 
     @GetMapping("/profile")
     public ModelAndView profile(Principal principal, ModelAndView maw) {
+        LOG.log(Level.INFO, String.format("Show profile for: %s", principal.getName()));
         maw.addObject("userProfile", userService.getUserProfile(principal.getName()));
         maw.setViewName("profile");
         return maw;
@@ -43,6 +50,7 @@ public class UserController {
 
     @GetMapping("/profile/update")
     public ModelAndView profileUpdate(Principal principal, ModelAndView maw) {
+        LOG.log(Level.INFO, String.format("Show profile update-form for: %s", principal.getName()));
         maw.addObject("profileUpdateDto", userService.getProfileForUpdate(principal.getName()));
         maw.setViewName("profile-update");
         return maw;
@@ -51,6 +59,7 @@ public class UserController {
     @PutMapping("/profile/update")
     public ModelAndView profileUpdate(@Valid ProfileUpdateDto dto, BindingResult bindingResult,
                                       Principal principal, ModelAndView maw) {
+        LOG.log(Level.INFO, String.format("Try to update profile for: %s", principal.getName()));
         if (bindingResult.hasFieldErrors("username"))
             bindingResult = userService.validateUniqueName(principal, dto, bindingResult, "profileUpdateDto");
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
@@ -66,6 +75,7 @@ public class UserController {
                     bindingResult);
             maw.setViewName("profile-update");
         } else {
+            LOG.log(Level.INFO, String.format("Update profile for: %s", principal.getName()));
             userService.updateUserProfile(dto, principal.getName());
             maw.setViewName("redirect:/user/profile");
         }
@@ -73,7 +83,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ModelAndView getUserById(@PathVariable String id, ModelAndView maw) {
+    public ModelAndView getUserById(@PathVariable String id, ModelAndView maw, Principal principal) {
+        LOG.log(Level.INFO, String.format("Show user by ID: %s for: %s", id, principal.getName()));
         UserResDto user = userService.getById(id);
         maw.addObject("user", user);
         maw.setViewName("user");
@@ -81,7 +92,8 @@ public class UserController {
     }
 
     @GetMapping("/add")
-    public ModelAndView createUser(ModelAndView maw) {
+    public ModelAndView createUser(ModelAndView maw, Principal principal) {
+        LOG.log(Level.INFO, String.format("Show user add-form for: %s", principal.getName()));
         maw.addObject("userReqDto", new UserReqDto());
         maw.addObject("roles", userRoleService.allUserRoles());
         maw.setViewName("user-add");
@@ -90,7 +102,8 @@ public class UserController {
 
     @PostMapping("/add")
     public ModelAndView createUser(@Valid UserReqDto userReqDto, BindingResult bindingResult,
-                                   ModelAndView maw) {
+                                   ModelAndView maw, Principal principal) {
+        LOG.log(Level.INFO, String.format("Try to add user for: %s", principal.getName()));
         if (bindingResult.hasErrors()) {
             maw.addObject("userReqDto", userReqDto);
             maw.addObject("roles", userRoleService.allUserRoles());
@@ -98,6 +111,7 @@ public class UserController {
                     bindingResult);
             maw.setViewName("user-add");
         } else {
+            LOG.log(Level.INFO, String.format("Add user by: %s", principal.getName()));
             userService.create(userReqDto);
             maw.setViewName("redirect:/user");
         }
@@ -105,7 +119,8 @@ public class UserController {
     }
 
     @GetMapping("/update/{id}")
-    public ModelAndView updateUser(@PathVariable String id, ModelAndView maw) {
+    public ModelAndView updateUser(@PathVariable String id, ModelAndView maw, Principal principal) {
+        LOG.log(Level.INFO, String.format("Show user update-form for: %s", principal.getName()));
         maw.addObject("userReqDto", userService.getForUpdate(id));
         maw.addObject("userId", id);
         maw.addObject("roles", userRoleService.allUserRoles());
@@ -116,7 +131,8 @@ public class UserController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView updateUser(@PathVariable String id, @Valid UserReqDto userReqDto,
-                                   BindingResult bindingResult, ModelAndView maw) {
+                                   BindingResult bindingResult, ModelAndView maw, Principal principal) {
+        LOG.log(Level.INFO, String.format("Try to update user %s for: %s", id, principal.getName()));
         if (bindingResult.hasFieldErrors("username")) {
             bindingResult = userService.validateUniqueName(id, userReqDto, bindingResult, "userReqDto");
         }
@@ -127,6 +143,7 @@ public class UserController {
             maw.addObject("org.springframework.validation.BindingResult.userReqDto", bindingResult);
             maw.setViewName("user-update");
         } else {
+            LOG.log(Level.INFO, String.format("Update user %s by: %s", id, principal.getName()));
             userService.update(id, userReqDto);
             maw.setViewName("redirect:/user/{id}");
         }
@@ -135,7 +152,8 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ModelAndView deleteUser(@PathVariable String id, ModelAndView maw) {
+    public ModelAndView deleteUser(@PathVariable String id, ModelAndView maw, Principal principal) {
+        LOG.log(Level.INFO, String.format("Delete user %s by: %s", id, principal.getName()));
         userService.delete(id);
         maw.setViewName("redirect:/user");
         return maw;

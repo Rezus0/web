@@ -4,6 +4,9 @@ import com.example.web_2.user.UserService;
 import com.example.web_2.user.dto.UserRegDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
@@ -22,6 +25,7 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 public class AuthController {
 
     private UserService userService;
+    private final static Logger LOG = LogManager.getLogger(Controller.class);
 
     @GetMapping("/register")
     public ModelAndView register(ModelAndView maw) {
@@ -33,6 +37,7 @@ public class AuthController {
     @PostMapping("register")
     public ModelAndView register(@Valid UserRegDto userRegDto, BindingResult bindingResult,
                                  HttpServletRequest request, ModelAndView maw) {
+        LOG.log(Level.INFO, String.format("Try to register user: %s", userRegDto.getUsername()));
         if (!userRegDto.getPassword().equals(userRegDto.getConfirmPassword())) {
             bindingResult.addError(new FieldError("userRegDto", "password",
                     "Password and confirmation must match"));
@@ -45,6 +50,7 @@ public class AuthController {
             maw.setViewName("register");
             return maw;
         }
+        LOG.log(Level.INFO, String.format("Register user: %s", userRegDto.getUsername()));
         SecurityContext ctx = userService.register(userRegDto);
         request.getSession(true).setAttribute(SPRING_SECURITY_CONTEXT_KEY, ctx);
         maw.setViewName("redirect:/");
