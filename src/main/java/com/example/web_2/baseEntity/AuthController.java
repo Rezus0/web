@@ -48,6 +48,7 @@ public class AuthController {
             maw.addObject("userRegDto", userRegDto);
             maw.addObject("org.springframework.validation.BindingResult.userRegDto", bindingResult);
             maw.setViewName("register");
+            LOG.log(Level.INFO, String.format("Failed to register: %s", userRegDto.getUsername()));
             return maw;
         }
         LOG.log(Level.INFO, String.format("Register user: %s", userRegDto.getUsername()));

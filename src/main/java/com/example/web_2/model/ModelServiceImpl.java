@@ -1,5 +1,6 @@
 package com.example.web_2.model;
 
+import com.example.web_2.baseEntity.ViewCountService;
 import com.example.web_2.brand.Brand;
 import com.example.web_2.brand.BrandRepository;
 import com.example.web_2.brand.exception.BrandNotFoundException;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,9 +33,11 @@ public class ModelServiceImpl implements ModelService {
     private ModelRepository modelRepository;
     private BrandRepository brandRepository;
     private final ModelMapper mapper;
+    private final ViewCountService viewCountService;
 
-    public ModelServiceImpl(ModelMapper mapper) {
+    public ModelServiceImpl(ModelMapper mapper, ViewCountService viewCountService) {
         this.mapper = mapper;
+        this.viewCountService = viewCountService;
     }
 
     @Override
@@ -55,17 +59,24 @@ public class ModelServiceImpl implements ModelService {
         List<ModelResDto> list = page
                 .getContent()
                 .stream()
-                .map(model -> mapper.map(model, ModelResDto.class))
+                .map(model -> {
+                    ModelResDto modelResDto = mapper.map(model, ModelResDto.class);
+                    Integer viewCount = viewCountService.getModelViewCount(modelResDto.getId());
+                    modelResDto.setViewCount(viewCount != null ? viewCount : 0);
+                    return modelResDto;
+                })
+                .sorted(Comparator.comparingLong(ModelResDto::getViewCount).reversed())
                 .toList();
         return new ModelPageResDto(pageNumber, totalPages, pageSize, list);
     }
 
     @Override
-    @Cacheable(cacheNames = "models", key = "#id")
+    @CacheEvict(cacheNames = "modelPage", allEntries = true)
     public ModelResDto getById(String id) {
         Optional<Model> optionalModel = modelRepository.findById(UUID.fromString(id));
         if (optionalModel.isEmpty())
             throw new ModelNotFoundException(String.format("Model with id \"%s\" not found", id));
+        viewCountService.incrementModelViewCounter(id);
         return mapper.map(optionalModel.get(), ModelResDto.class);
     }
 

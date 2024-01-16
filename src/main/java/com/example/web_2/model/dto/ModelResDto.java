@@ -12,6 +12,7 @@ public class ModelResDto extends BaseResDto {
     private int startYear;
     private int endYear;
     private BrandResDto brand;
+    private int viewCount;
 
     public String getId() {
         return id;
@@ -67,5 +68,13 @@ public class ModelResDto extends BaseResDto {
 
     public void setBrand(BrandResDto brand) {
         this.brand = brand;
+    }
+
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
     }
 }

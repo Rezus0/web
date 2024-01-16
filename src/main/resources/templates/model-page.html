@@ -14,6 +14,7 @@
                         <h3 th:text="'Name: ' + *{m.name}"></h3>
                         <h3 th:text="'Category: ' + *{m.category}"></h3>
                         <h3 th:text="'Brand Name: ' + *{m.brand.name}"></h3>
+                        <h5 th:text="'👁️ ' + *{m.viewCount}"></h5>
                         <h4><a class="btn-block" th:href="@{/model/{id}(id=*{m.id})}">Detail info</a></h4>
                     </div>
                 </div>

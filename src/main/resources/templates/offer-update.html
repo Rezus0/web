@@ -134,7 +134,7 @@
                     <div class="mb-3">
                         <label class="form-label" for="model"><h5>All available models</h5></label>
                         <select multiple="false" class="form-control text-center" th:errorclass="is-invalid"
-                                id="model" name="name" th:field="*{modelIdentifier}">
+                                id="model" name="modelIdentifier" th:field="*{modelIdentifier}">
                             <option th:each="m : ${models}"
                                     th:value="${m.id}"
                                     th:text="${m.name}"
@@ -148,7 +148,7 @@
                     <div class="mb-3">
                         <label class="form-label" for="seller"><h5>All available sellers</h5></label>
                         <select multiple="false" class="form-control text-center" th:errorclass="is-invalid"
-                                id="seller" name="name" th:field="*{sellerIdentifier}">
+                                id="seller" name="sellerIdentifier" th:field="*{sellerIdentifier}">
                             <option th:each="s : ${sellers}"
                                     th:value="${s.id}"
                                     th:text="${s.username}"
