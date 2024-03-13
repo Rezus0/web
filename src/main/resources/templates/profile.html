@@ -12,7 +12,15 @@
                     <h1>My Profile</h1>
                 </div>
                 <div class="row bg-light rounded">
-                    <div class="col-md-6"><img src="/pic/profile.png" height="350px" alt="image"></div>
+                    <div class="col-md-6">
+                        <img th:src="${profilePicture}" height="350px" alt="image">
+                        <form th:action="@{/user/profile/update/picture}" th:method="post" enctype="multipart/form-data">
+                            <input type="file" name="picture" accept="image/*"/>
+                            <button type="submit" class="btn btn-success align-bottom">
+                                Change Picture
+                            </button>
+                        </form>
+                    </div>
                     <div class="col-md-6 pt-3">
                         <h4 th:text="'Username: ' + ${userProfile.username}"></h4>
                         <h4 th:text="'Password: ******'"></h4>

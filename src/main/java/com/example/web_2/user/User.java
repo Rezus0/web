@@ -2,6 +2,7 @@ package com.example.web_2.user;
 
 import com.example.web_2.baseEntity.BaseEntity;
 import com.example.web_2.offer.Offer;
+import com.example.web_2.user.profilePicture.ProfilePicture;
 import com.example.web_2.user.user_role.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -26,6 +27,7 @@ public class User extends BaseEntity implements UserDetails {
     private UserRole role;
     private String imageUrl;
     private List<Offer> offers;
+    private ProfilePicture picture;
 
     @Column(nullable = false, unique = true)
     @NotBlank(message = "User's username can't be blank")
@@ -69,6 +71,11 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "seller")
     public List<Offer> getOffers() {
         return offers;
+    }
+
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "user")
+    public ProfilePicture getPicture() {
+        return picture;
     }
 
     @Transient
@@ -131,5 +138,9 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setOffers(List<Offer> offers) {
         this.offers = offers;
+    }
+
+    public void setPicture(ProfilePicture picture) {
+        this.picture = picture;
     }
 }

@@ -4,6 +4,7 @@ import com.example.web_2.user.dto.ProfileUpdateDto;
 import com.example.web_2.user.dto.UserPageResDto;
 import com.example.web_2.user.dto.UserReqDto;
 import com.example.web_2.user.dto.UserResDto;
+import com.example.web_2.user.profilePicture.ProfilePictureService;
 import com.example.web_2.user.user_role.UserRoleService;
 import jakarta.validation.Valid;
 import org.apache.logging.log4j.Level;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
@@ -24,6 +26,7 @@ import java.security.Principal;
 public class UserController {
     private UserService userService;
     private UserRoleService userRoleService;
+    private ProfilePictureService profilePictureService;
     private final static Logger LOG = LogManager.getLogger(Controller.class);
 
     @GetMapping
@@ -43,6 +46,18 @@ public class UserController {
     @GetMapping("/profile")
     public ModelAndView profile(Principal principal, ModelAndView maw) {
         LOG.log(Level.INFO, String.format("Show profile for: %s", principal.getName()));
+        maw.addObject("userProfile", userService.getUserProfile(principal.getName()));
+        maw.addObject("profilePicture", profilePictureService.getProfilePicture(principal.getName()));
+        maw.setViewName("profile");
+        return maw;
+    }
+
+    @PostMapping("/profile/update/picture")
+    public ModelAndView profilePictureUpdate(Principal principal, ModelAndView maw,
+                                             @RequestParam MultipartFile picture) {
+        LOG.log(Level.INFO, String.format("Try to change profile picture for user: %s", principal.getName()));
+        maw.addObject("profilePicture",
+                profilePictureService.changeProfilePicture(picture, principal.getName()));
         maw.addObject("userProfile", userService.getUserProfile(principal.getName()));
         maw.setViewName("profile");
         return maw;
@@ -167,5 +182,10 @@ public class UserController {
     @Autowired
     public void setUserRoleService(UserRoleService userRoleService) {
         this.userRoleService = userRoleService;
+    }
+
+    @Autowired
+    public void setProfilePictureService(ProfilePictureService profilePictureService) {
+        this.profilePictureService = profilePictureService;
     }
 }
